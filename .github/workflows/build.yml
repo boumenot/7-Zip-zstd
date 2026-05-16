@@ -2,6 +2,11 @@
 name: Build 7z.dll
 on: [push, pull_request]
 
+permissions:
+  contents: read
+  id-token: write
+  attestations: write
+
 jobs:
 
   build-7z-dll:
@@ -32,8 +37,22 @@ jobs:
         run: |
           Compress-Archive -Path CPP\7zip\Bundles\Format7zF\x64\7z.dll -DestinationPath 7z-dll-win-x64.zip
 
+      - name: Generate SHA256 checksum
+        shell: pwsh
+        run: |
+          $hash = (Get-FileHash -Algorithm SHA256 7z-dll-win-x64.zip).Hash.ToLower()
+          "$hash  7z-dll-win-x64.zip" | Out-File -Encoding ascii 7z-dll-win-x64.zip.sha256
+          Write-Output "SHA256: $hash"
+
+      - name: Generate artifact attestation
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: 7z-dll-win-x64.zip
+
       - name: Upload 7z-dll-win-x64.zip
         uses: actions/upload-artifact@v6
         with:
           name: 7z-dll-win-x64
-          path: 7z-dll-win-x64.zip
+          path: |
+            7z-dll-win-x64.zip
+            7z-dll-win-x64.zip.sha256
