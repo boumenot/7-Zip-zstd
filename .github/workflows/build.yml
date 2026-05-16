@@ -43,10 +43,24 @@ jobs:
           nmake /NOLOGO
           if %errorlevel% neq 0 exit 1
 
-      - name: Test with 7za.exe
+      - name: Build 7z.exe (x64)
         shell: cmd
         run: |
-          set Z7_PATH=CPP\7zip\Bundles\Alone\x64\7za.exe
+          call "%VCVARSALL_PATH%" x64
+          set SUBSYS=5.02
+          set LFLAGS=/SUBSYSTEM:CONSOLE,5.02
+          set ZIP7_DARKMODE=0
+          cd CPP\7zip\UI\Console
+          nmake /NOLOGO
+          if %errorlevel% neq 0 exit 1
+
+      - name: Test with 7z.exe + 7z.dll
+        shell: cmd
+        run: |
+          mkdir test-bin
+          copy CPP\7zip\UI\Console\x64\7z.exe test-bin\7z.exe
+          copy CPP\7zip\Bundles\Format7zF\x64\7z.dll test-bin\7z.dll
+          set Z7_PATH=test-bin\7z.exe
           tclsh tests\7z-test.tcl -verbose tpsem
 
       - name: Package artifacts
