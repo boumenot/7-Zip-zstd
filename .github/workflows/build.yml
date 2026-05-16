@@ -1,5 +1,5 @@
 
-name: Build 7z.dll
+name: Build binaries
 on: [push, pull_request]
 
 permissions:
@@ -9,7 +9,7 @@ permissions:
 
 jobs:
 
-  build-7z-dll:
+  build:
     runs-on: windows-2025-vs2026
     steps:
       - uses: actions/checkout@v6
@@ -32,34 +32,58 @@ jobs:
           nmake /NOLOGO
           if %errorlevel% neq 0 exit 1
 
-      - name: Package 7z.dll
+      - name: Build 7za.exe (x64)
+        shell: cmd
+        run: |
+          call "%VCVARSALL_PATH%" x64
+          set SUBSYS=5.02
+          set LFLAGS=/SUBSYSTEM:CONSOLE,5.02
+          set ZIP7_DARKMODE=0
+          cd CPP\7zip\Bundles\Alone
+          nmake /NOLOGO
+          if %errorlevel% neq 0 exit 1
+
+      - name: Package artifacts
         shell: pwsh
         run: |
           Compress-Archive -Path CPP\7zip\Bundles\Format7zF\x64\7z.dll -DestinationPath 7z-dll-win-x64.zip
+          Compress-Archive -Path CPP\7zip\Bundles\Alone\x64\7za.exe -DestinationPath 7za-win-x64.zip
 
-      - name: Generate SHA256 checksum
+      - name: Generate SHA256 checksums
         shell: pwsh
         run: |
-          $hash = (Get-FileHash -Algorithm SHA256 7z-dll-win-x64.zip).Hash.ToLower()
-          "$hash  7z-dll-win-x64.zip" | Out-File -Encoding ascii 7z-dll-win-x64.zip.sha256
-          Write-Output "SHA256: $hash"
+          foreach ($file in @("7z-dll-win-x64.zip", "7za-win-x64.zip")) {
+            $hash = (Get-FileHash -Algorithm SHA256 $file).Hash.ToLower()
+            "$hash  $file" | Out-File -Encoding ascii "$file.sha256"
+            Write-Output "${file}: $hash"
+          }
 
-      - name: Generate artifact attestation
-        id: attestation
+      - name: Attest 7z-dll-win-x64.zip
+        id: attest-dll
         uses: actions/attest-build-provenance@v2
         with:
           subject-path: 7z-dll-win-x64.zip
 
-      - name: Copy sigstore bundle
+      - name: Attest 7za-win-x64.zip
+        id: attest-exe
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: 7za-win-x64.zip
+
+      - name: Copy sigstore bundles
         shell: pwsh
         run: |
-          Copy-Item "${{ steps.attestation.outputs.bundle-path }}" 7z-dll-win-x64.zip.sigstore.json
+          Copy-Item "${{ steps.attest-dll.outputs.bundle-path }}" 7z-dll-win-x64.zip.sigstore.json
+          Copy-Item "${{ steps.attest-exe.outputs.bundle-path }}" 7za-win-x64.zip.sigstore.json
 
-      - name: Upload 7z-dll-win-x64.zip
+      - name: Upload artifacts
         uses: actions/upload-artifact@v6
         with:
-          name: 7z-dll-win-x64
+          name: binaries-win-x64
           path: |
             7z-dll-win-x64.zip
             7z-dll-win-x64.zip.sha256
             7z-dll-win-x64.zip.sigstore.json
+            7za-win-x64.zip
+            7za-win-x64.zip.sha256
+            7za-win-x64.zip.sigstore.json
