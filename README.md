@@ -1,10 +1,12 @@
 
 ## Forked from mcmilk
 
+[![Build binaries](https://github.com/boumenot/7-Zip-zstd/actions/workflows/build.yml/badge.svg)](https://github.com/boumenot/7-Zip-zstd/actions/workflows/build.yml)
+
 This is a **fork** of [mcmilk/7-Zip-zstd](https://github.com/mcmilk/7-Zip-zstd).
 
-This fork produces only the `7z.dll` binary for Windows x64. It is
-intended for use cases where only the library is needed, without the
+This fork produces only the `7z.dll` and `7za.exe` binaries for Windows x64. It is
+intended for use cases where only the library or standalone CLI is needed, without the
 full 7-Zip ZS installer or GUI components.
 
 ---
