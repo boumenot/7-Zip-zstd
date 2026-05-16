@@ -43,6 +43,12 @@ jobs:
           nmake /NOLOGO
           if %errorlevel% neq 0 exit 1
 
+      - name: Test with 7za.exe
+        shell: cmd
+        run: |
+          set Z7_PATH=CPP\7zip\Bundles\Alone\x64\7za.exe
+          tclsh tests\7z-test.tcl -verbose tpsem
+
       - name: Package artifacts
         shell: pwsh
         run: |
