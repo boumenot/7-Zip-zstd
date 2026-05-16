@@ -45,9 +45,15 @@ jobs:
           Write-Output "SHA256: $hash"
 
       - name: Generate artifact attestation
+        id: attestation
         uses: actions/attest-build-provenance@v2
         with:
           subject-path: 7z-dll-win-x64.zip
+
+      - name: Copy sigstore bundle
+        shell: pwsh
+        run: |
+          Copy-Item "${{ steps.attestation.outputs.bundle-path }}" 7z-dll-win-x64.zip.sigstore.json
 
       - name: Upload 7z-dll-win-x64.zip
         uses: actions/upload-artifact@v6
@@ -56,3 +62,4 @@ jobs:
           path: |
             7z-dll-win-x64.zip
             7z-dll-win-x64.zip.sha256
+            7z-dll-win-x64.zip.sigstore.json
