@@ -2,6 +2,8 @@
 ## Forked from mcmilk
 
 [![Build binaries](https://github.com/boumenot/7-Zip-zstd/actions/workflows/build.yml/badge.svg)](https://github.com/boumenot/7-Zip-zstd/actions/workflows/build.yml)
+[![Latest release](https://img.shields.io/github/release/boumenot/7-Zip-zstd.svg)](https://github.com/boumenot/7-Zip-zstd/releases)
+[![License: LGPL v2.1+](https://img.shields.io/badge/License-LGPL_v2.1+-blue.svg)](COPYING)
 
 This is a **fork** of [mcmilk/7-Zip-zstd](https://github.com/mcmilk/7-Zip-zstd).
 
