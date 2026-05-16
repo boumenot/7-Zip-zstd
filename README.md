@@ -1,3 +1,13 @@
+
+## Forked from mcmilk
+
+This is a **fork** of [mcmilk/7-Zip-zstd](https://github.com/mcmilk/7-Zip-zstd).
+
+This fork produces only the `7z.dll` binary for Windows x64. It is
+intended for use cases where only the library is needed, without the
+full 7-Zip ZS installer or GUI components.
+
+---
 
 # README
 
